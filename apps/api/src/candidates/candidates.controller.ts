@@ -6,8 +6,14 @@ export class CandidatesController {
   constructor(private readonly candidatesService: CandidatesService) {}
 
   @Get()
-  async getRecruiterDashboard() {
-    return this.candidatesService.getRecruiterDashboard();
+  async getRecruiterDashboard(
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    return this.candidatesService.getRecruiterDashboard({
+      limit: limit ? Number(limit) : undefined,
+      offset: offset ? Number(offset) : undefined,
+    });
   }
 
   @Post('sync')

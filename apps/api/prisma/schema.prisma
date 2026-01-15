@@ -12,7 +12,7 @@ datasource db {
 model Candidate {
   id          String   @id @default(uuid())
   email      String
-  externalId  String
+  externalId  String   @unique
   firstName   String
   lastName    String
   createdAt   DateTime @default(now())
@@ -20,6 +20,9 @@ model Candidate {
 
   applications Application[]
   interviewNotes InterviewNote[]
+
+  @@index([createdAt, id])
+  @@index([email])
 }
 
 model Application {
@@ -32,6 +35,9 @@ model Application {
 
   candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   interviewNotes InterviewNote[]
+
+  @@index([candidateId])
+  @@index([createdAt, id])
 }
 
 model InterviewNote {
@@ -50,4 +56,8 @@ model InterviewNote {
 
   candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([candidateId])
+  @@index([applicationId])
+  @@index([createdAt, id])
 }

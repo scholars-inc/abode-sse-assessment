@@ -7,6 +7,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
   Alert,
@@ -17,7 +18,13 @@ import { useState } from 'react';
 
 function Dashboard() {
   const [syncError, setSyncError] = useState<string | null>(null);
-  const { data, error, refetch } = useGetCandidatesQuery({});
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+
+  const { data, error, refetch, isFetching } = useGetCandidatesQuery({
+    limit: rowsPerPage,
+    offset: page * rowsPerPage,
+  });
   const [syncFromAts] = useSyncFromAtsMutation();
 
   const handleSync = async () => {
@@ -40,6 +47,7 @@ function Dashboard() {
           variant="contained"
           startIcon={<SyncIcon />}
           onClick={handleSync}
+          disabled={isFetching}
         >
           Sync from ATS
         </Button>
@@ -90,7 +98,7 @@ function Dashboard() {
                       : 'N/A'}
                   </TableCell>
                   <TableCell>
-                    {candidate.applications?.reduce((total, app) => total + (app.interviewNotes?.length || 0), 0) || 0}
+                    {candidate.interviewNotesCount ?? 0}
                   </TableCell>
                   <TableCell>
                     {new Date(candidate.createdAt).toLocaleDateString()}
@@ -101,6 +109,21 @@ function Dashboard() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {data && (
+        <TablePagination
+          component="div"
+          count={data.total}
+          page={page}
+          onPageChange={(_, nextPage) => setPage(nextPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(Number(e.target.value));
+            setPage(0);
+          }}
+          rowsPerPageOptions={[10, 25, 50, 100]}
+        />
+      )}
 
       {data && (
         <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>

@@ -28,7 +28,7 @@ export interface Candidate {
   lastName: string;
   createdAt: string;
   updatedAt: string;
-  applications: Application[];
+  interviewNotesCount: number;
   averageScore: number | null;
 }
 
@@ -52,9 +52,9 @@ export const candidatesApi = createApi({
   tagTypes: ['Candidates'],
   endpoints: (builder) => ({
     getCandidates: builder.query<CandidatesResponse, { limit?: number; offset?: number }>({
-      query: ({ limit, offset }) => ({
+      query: ({ limit = 25, offset = 0 } = {}) => ({
         url: '/candidates',
-        params: limit !== undefined ? { limit, offset } : {},
+        params: { limit, offset },
       }),
       providesTags: ['Candidates'],
     }),
